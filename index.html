@@ -124,8 +124,8 @@ footer small{display:block;margin-top:16px;color:#C9C2EE}
         <p class="lead">نونو بومة بتعلّم طفلك الحروف والأرقام والحيوانات والألوان بصوت مصري، وبالعربي والإنجليزي. من ٣ لـ ٧ سنين.</p>
 
         <div class="status chunky" id="status" aria-live="polite">
-          <h2 class="d" id="stTitle">النسخة التجريبية تفتح الاتنين ٢ نوفمبر</h2>
-          <p id="stText">متاحة ١٠ أيام بس، لكل الأطفال.</p>
+          <h2 class="d" id="stTitle">النسخة التجريبية مفتوحة دلوقتي!</h2>
+          <p id="stText">متاحة لمدة شهر، لكل الأطفال.</p>
           <div class="count" id="stCount" role="timer" aria-label="فاضل قد إيه على الفتح"></div>
           <div class="row" id="stRow">
             <a class="btn mint" id="stWa" href="#" target="_blank" rel="noopener">
@@ -222,7 +222,7 @@ footer small{display:block;margin-top:16px;color:#C9C2EE}
 
 <script>
 (function(){
-  var OPEN_AT=Date.parse("2026-11-02T00:00:00+02:00"),CLOSE_AT=Date.parse("2026-11-12T00:00:00+02:00"),WA="201040517646";
+  var OPEN_AT=Date.parse("2026-11-02T00:00:00+02:00"),CLOSE_AT=Date.parse("2026-12-02T00:00:00+02:00"),WA="201040517646";
   var AR="٠١٢٣٤٥٦٧٨٩",num=function(n){return String(n).replace(/\d/g,function(d){return AR[d]})};
   var $=function(id){return document.getElementById(id)};
   function wa(t){return "https://wa.me/"+WA+"?text="+encodeURIComponent(t)}
@@ -237,7 +237,7 @@ footer small{display:block;margin-top:16px;color:#C9C2EE}
     }else if(now<CLOSE_AT){
       var left=Math.max(1,Math.ceil((CLOSE_AT-now)/36e5));
       $("stTitle").textContent="النسخة التجريبية مفتوحة دلوقتي!";
-      $("stText").textContent=left>48?"فاضل "+num(Math.ceil(left/24))+" أيام، العبوا قبل ما تقفل.":"فاضل "+num(left)+(left>=3&&left<=10?" ساعات":" ساعة")+"، العبوا قبل ما تقفل.";
+      $("stText").textContent=left>48?"فاضل "+num(Math.ceil(left/24))+(Math.ceil(left/24)<=10?" أيام":" يوم")+"، العبوا قبل ما تقفل.":"فاضل "+num(left)+(left>=3&&left<=10?" ساعات":" ساعة")+"، العبوا قبل ما تقفل.";
       $("stCount").hidden=true;$("stPlay").hidden=false;
       $("stWaText").textContent="ابعتلنا رأيك";$("stWa").href=wa("أهلاً! جربنا نونو والتعلّم ورأينا إن...");
     }else{
