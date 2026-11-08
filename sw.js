@@ -1,5 +1,5 @@
 /* Keeps Nono working offline: pages refresh from the network when online, everything else is served from the cache first. */
-const CACHE = "nono-v17";
+const CACHE = "nono-v18";
 const CORE = ["./", "index.html", "app.html", "voice_ar.js", "voice_en.js", "manifest.webmanifest", "img/icon-192.png", "img/icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

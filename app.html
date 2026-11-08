@@ -450,6 +450,11 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--grape);outline-offs
 .overlay.rest-overlay{background:rgba(27,22,60,.85)}
 .home-btn svg{width:26px;height:26px}
 .home-btn{background:var(--sun)}
+
+html,body{overflow:hidden}
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){
+ body::after{content:"📱 لف الموبايل بالطول عشان تلعب مع نونو";position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;background:#8B5CF6;color:#fff;font:400 30px Lalezar,system-ui,sans-serif;direction:rtl}
+}
 </style>
 </head>
 <body>
@@ -1114,8 +1119,9 @@ function openLesson(){
   if(isWord())say("يلا نكتب الكلمة! امشي بصباعك على الحروف",null,"trace_w");
   else say(isNum()?"امشي بصباعك على الرقم، ولوّنه كلّه":"امشي بصباعك على الحرف، ولوّنه كلّه",null,isNum()?"trace_n":"trace");
 }
+const appZ=()=>{const a=$("#app");return (a&&a.offsetWidth)?a.getBoundingClientRect().width/a.offsetWidth:1};
 function layoutBoard(){
-  const box=$("#board").getBoundingClientRect(),word=isWord();
+  const zq=appZ(),bb=$("#board").getBoundingClientRect(),box={width:bb.width/zq,height:bb.height/zq},word=isWord();
   if(word){cw=Math.floor(box.width-16);chh=Math.floor(Math.min(box.height-16,cw*.75))}else{cw=chh=Math.floor(Math.min(box.width,box.height)-12)}
   if(cw<120)cw=120;if(chh<100)chh=100;size=Math.min(cw,chh);
   dpr=Math.min(2,window.devicePixelRatio||1);[guide,ink].forEach(c=>{c.width=cw*dpr;c.height=chh*dpr;c.style.width=cw+"px";c.style.height=chh+"px"});
@@ -1134,7 +1140,7 @@ function layoutBoard(){
   ictx.clearRect(0,0,ink.width,ink.height);parts=null;
 }
 function setMeter(p){$("#meterFill").style.width=Math.round(p*100)+"%";$(".meter").setAttribute("aria-valuenow",Math.round(p*100))}
-function pt(e){const r=ink.getBoundingClientRect();return{x:(e.clientX-r.left)*dpr,y:(e.clientY-r.top)*dpr}}
+function pt(e){const r=ink.getBoundingClientRect(),zq=appZ();return{x:(e.clientX-r.left)/zq*dpr,y:(e.clientY-r.top)/zq*dpr}}
 ink.addEventListener("pointerdown",e=>{if(passed)return;drawing=true;ink.setPointerCapture(e.pointerId);last=pt(e);stroke(last,last)});
 ink.addEventListener("pointermove",e=>{if(!drawing)return;const p=pt(e);stroke(last,p);last=p});
 ["pointerup","pointercancel"].forEach(ev=>ink.addEventListener(ev,()=>{if(!drawing)return;drawing=false;check()}));
@@ -1241,7 +1247,7 @@ function shoot(){if(arrows.length>=3)return;const pv=pivot();
   let best=null,bestA=0.2;targets.forEach(t=>{if(t.dead)return;const cx=t.x+42,cy=t.y+42,a=Math.atan2(cx-pv.x,pv.y-cy),me=Math.atan2(aimDir.x,-aimDir.y),d=Math.abs(a-me);if(d<bestA){bestA=d;best={x:Math.sin(a),y:-Math.cos(a)}}});
   if(best)aimDir=best;const el=document.createElement("div");el.className="arrow";el.innerHTML=ARROW_SVG;tfield.appendChild(el);
   arrows.push({el,x:pv.x,y:pv.y,dx:aimDir.x,dy:aimDir.y,ang:Math.atan2(aimDir.x,-aimDir.y)*180/Math.PI,dead:false});sweep(300,900,.18,"triangle",.14)}
-function tpos(e){const r=tfield.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function tpos(e){const r=tfield.getBoundingClientRect(),zq=appZ();return{x:(e.clientX-r.left)/zq,y:(e.clientY-r.top)/zq}}
 tfield.addEventListener("pointerdown",e=>{if(!running||current.id!=="throw")return;aiming=true;try{tfield.setPointerCapture(e.pointerId)}catch(_){}const p=tpos(e);setAim(p.x,p.y);pullHint.classList.add("gone");e.preventDefault()});
 tfield.addEventListener("pointermove",e=>{if(!aiming)return;const p=tpos(e);setAim(p.x,p.y);e.preventDefault()});
 function release(){if(!aiming)return;aiming=false;clearAim();if(running)shoot()}
@@ -1450,7 +1456,7 @@ $("#certShare").addEventListener("click",async()=>{track("share");
 /* ---------- confetti ---------- */
 function confetti(){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-  const c=$("#confetti"),r=$("#app").getBoundingClientRect();c.width=r.width;c.height=r.height;const x=c.getContext("2d");
+  const c=$("#confetti"),a0=$("#app"),r={width:a0.offsetWidth,height:a0.offsetHeight};c.width=r.width;c.height=r.height;const x=c.getContext("2d");
   const ps=Array.from({length:90},()=>({x:r.width/2,y:r.height*.45,vx:(Math.random()-.5)*9,vy:-Math.random()*10-4,s:6+Math.random()*7,c:pick(COLORS),r:Math.random()*6,vr:(Math.random()-.5)*.3}));
   let f=0;(function tick(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/3,p.s,p.s*.66);x.restore()});
     if(++f<90)requestAnimationFrame(tick);else x.clearRect(0,0,c.width,c.height)})();
@@ -1613,12 +1619,18 @@ $$("[data-back]").forEach(b=>{const sc=b.closest(".screen");if(!sc||["home","pro
   const h=document.createElement("button");h.type="button";h.className="btn icon-btn home-btn";h.setAttribute("aria-label","الرئيسية");h.innerHTML=NAV[0][2];
   h.addEventListener("click",()=>{sfx.tap();if(prog.name&&kids.includes(prog))goHome();else back()});b.after(h)});
 
+/* ================= fit to big screens (tablets) ================= */
+(()=>{const a=document.getElementById("app");if(!a)return;
+  function fit(){const z=Math.max(1,Math.min(innerWidth/460,innerHeight/860));
+    if(z>1.05){a.style.width="460px";a.style.transformOrigin="top center";a.style.transform="scale("+z.toFixed(3)+")";a.style.height=(innerHeight/z)+"px"}
+    else{a.style.width="";a.style.transform="";a.style.height=""}}
+  addEventListener("resize",fit);addEventListener("orientationchange",()=>setTimeout(fit,200));fit()})();
 applyLang();paintNav();paintSound();
 $("#splashBubble").textContent=T("أهلاً! أنا نونو، تعالى نتعلّم سَوا!");$("#splash").dataset.clip="welcome2";
 setTimeout(()=>{if(current.id==="splash")say("أهلاً! أنا نونو، تعالى نتعلّم سَوا!",$("#splash"),"welcome2")},600);
 
 /* installed app: if a newer version is online, open it (progress comes along); offline keeps the built-in copy */
-(function(){const APP_V=17,SITE="https://nono-learning.github.io/";if(!(window.Capacitor&&location.hostname==="localhost")||!navigator.onLine)return;
+(function(){const APP_V=18,SITE="https://nono-learning.github.io/";if(!(window.Capacitor&&location.hostname==="localhost")||!navigator.onLine)return;
   const ctl=new AbortController();setTimeout(()=>ctl.abort(),4000);
   fetch(SITE+"version.json?t="+Date.now(),{signal:ctl.signal,cache:"no-store"}).then(r=>r.json()).then(j=>{if(!j||!(j.v>APP_V))return;const data={};
     for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("hrofi"))data[k]=localStorage.getItem(k)}
